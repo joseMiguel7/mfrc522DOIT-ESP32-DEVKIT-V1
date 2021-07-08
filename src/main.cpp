@@ -39,25 +39,26 @@
 #define RST_PIN         9          // Configurable, see typical pin layout above
 #define SS_PIN          5         // Configurable, see typical pin layout above
 
+MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance
 
+void SetUp() {
 
+	Serial2.begin(9600);		// Initialize serial communications with the PC
+	while (!Serial2);		// Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
+	SPI.begin();			// Init SPI bus
+	mfrc522.PCD_Init();		// Init MFRC522
+	delay(4);				// Optional delay. Some board do need more time after init to be ready, see Readme
+	// for (int i=0; i<200000; i++)
+	// 	{;}
+	mfrc522.PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
+	// Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
+	Serial2.print("Scan PICC to see UID, SAK, type, and data blocks...");
+
+}
 
 
 extern "C" void app_main() {
 
-	MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance
-	
-	//MySerial.begin(9600);		// Initialize serial communications with the PC
-	//while (!MySerial);		// Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
-	SPI.begin();			// Init SPI bus
-	mfrc522.PCD_Init();		// Init MFRC522
-	//delayArduino(4);				// Optional delay. Some board do need more time after init to be ready, see Readme
-	for (int i=0; i<200000; i++)
-		{;}
-	mfrc522.PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
-	// Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
-	printf(("Scan PICC to see UID, SAK, type, and data blocks..."));
-	
 	while(1){
 		// Reset the loop if no new card present on the sensor/reader. This saves the entire process when idle.
 		if ( ! mfrc522.PICC_IsNewCardPresent()) {
