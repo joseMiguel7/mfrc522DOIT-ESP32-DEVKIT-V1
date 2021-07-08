@@ -190,12 +190,12 @@ size_t Print::println(const String &s)
     return n;
 }
 
-/*size_t Print::println(const char c[])
+size_t Print::println(const char c[])
 {
     size_t n = print(c);
     n += println();
     return n;
-}*/ //JMJ
+}
 
 size_t Print::println(char c)
 {

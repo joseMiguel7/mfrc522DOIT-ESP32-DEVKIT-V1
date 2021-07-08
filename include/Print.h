@@ -55,6 +55,7 @@ public:
         setWriteError(0);
     }
 
+    
     virtual size_t write(uint8_t) = 0;
     size_t write(const char *str)
     {
@@ -63,7 +64,7 @@ public:
         }
         return write((const uint8_t *) str, strlen(str));
     }
-    virtual size_t write(const uint8_t *buffer, size_t size);
+    virtual size_t write(const uint8_t *buffer, size_t size); 
     size_t write(const char *buffer, size_t size)
     {
         return write((const uint8_t *) buffer, size);
@@ -74,7 +75,8 @@ public:
     // add availableForWrite to make compatible with Arduino Print.h
     // default to zero, meaning "a single write may block"
     // should be overriden by subclasses with buffering
-    virtual int availableForWrite() { return 0; }
+    
+    virtual int availableForWrite() { return 0; } 
     // size_t print(const __FlashStringHelper *); //JMJ
     size_t print(const String &);
     size_t print(const char[]); 

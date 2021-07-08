@@ -7,7 +7,7 @@
 #include "Arduino.h"
 #include "esp32-hal-gpio.h"
 #include "MFRC522.h"
-#include "printf.h"
+#include "print.h"
 #include "HardwareSerial.h"
 #include "esp32-hal-uart.h"
 #include "esp32-hal.h"
@@ -1369,11 +1369,11 @@ void MFRC522::PCD_DumpVersionToSerial() {
 	printf("%x",v);
 	// Lookup which version
 	switch(v) {
-		case 0x88: print(" = clone\n");  break;
-		case 0x90: print(" = v0.0\n ");     break;
-		case 0x91: print(" = v1.0\n");     break;
-		case 0x92: print(" = v2.0\n");     break;
-		case 0x12: print(" = counterfeit chip\n");     break;
+		case 0x88: printf(" = clone\n");  break;
+		case 0x90: printf(" = v0.0\n ");     break;
+		case 0x91: printf(" = v1.0\n");     break;
+		case 0x92: printf(" = v2.0\n");     break;
+		case 0x12: printf(" = counterfeit chip\n");     break;
 		default:   printf(" = (unknown)\n");
 	}
 	// When 0x00 or 0xFF is returned, communication probably failed
@@ -1551,7 +1551,7 @@ void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to U
 			if(sector < 10)
 				printf("   "); // Pad with spaces
 			else
-				printff("  "); // Pad with spaces
+				printf("  "); // Pad with spaces
 			printf("%x",sector);
 			printf("   ");
 		}
@@ -1567,7 +1567,7 @@ void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to U
 			else
 				printf(" "); // Pad with spaces
 		}
-		printf("%x",blockAddr;
+		printf("%x",blockAddr);
 		printf("  ");
 		// Establish encrypted communications before reading the first block
 		if (isSectorTrailer) {
@@ -1640,7 +1640,7 @@ void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to U
 			printf(" Value=0x"); printf("%x",value);
 			printf(" Adr=0x"); printf("%x",buffer[12]);
 		}
-		printff("\n");
+		printf("\n");
 	}
 	
 	return;
@@ -1655,7 +1655,7 @@ void MFRC522::PICC_DumpMifareUltralightToSerial() {
 	byte buffer[18];
 	byte i;
 	
-	printff("Page  0  1  2  3");
+	printf("Page  0  1  2  3");
 	// Try the mpages of the original Ultralight. Ultralight C has more pages.
 	for (byte page = 0; page < 16; page +=4) { // Read returns data for 4 pages at a time.
 		// Read pages
@@ -1768,7 +1768,7 @@ bool MFRC522::MIFARE_OpenUidBackdoor(bool logErrors) {
 	if (received != 1 || response[0] != 0x0A) {
 		if (logErrors) {
 			printf("Got bad response on backdoor 0x43 command: ");
-			printf"%x",(response[0]);
+			printf("%x",(response[0]));
 			printf(" (");
 			printf("%d",validBits);
 			printf(" valid bits)\n");
@@ -1812,7 +1812,7 @@ bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 //			  PICC_WakeupA(atqa_answer, &atqa_size);
 			
 			if (!PICC_IsNewCardPresent() || !PICC_ReadCardSerial()) {
-				printf("No card was previously selected, and none are available. Failed to set UID.\");
+				printf("No card was previously selected, and none are available. Failed to set UID.\n");
 				return false;
 			}
 			
