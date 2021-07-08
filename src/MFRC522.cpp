@@ -43,7 +43,7 @@ MFRC522::MFRC522(	byte chipSelectPin,		///< Arduino pin connected to MFRC522's S
 	_resetPowerDownPin = resetPowerDownPin;
 } // End constructor
 
-// printf::printf MySerial() : write_error(0);
+// print::print MySerial() : write_error(0);
 // 
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -737,7 +737,7 @@ MFRC522::StatusCode MFRC522::PICC_Select(	Uid *uid,			///< Pointer to Uid struct
 		while (!selectDone) {
 			// Find out how many bits and bytes to send and receive.
 			if (currentLevelKnownBits >= 32) { // All UID bits in this Cascade Level are known. This is a SELECT.
-				//printf(F("SELECT: currentLevelKnownBits=")); println(currentLevelKnownBits, DEC);
+				//print(F("SELECT: currentLevelKnownBits=")); println(currentLevelKnownBits, DEC);
 				buffer[1] = 0x70; // NVB - Number of Valid Bits: Seven whole bytes
 				// Calculate BCC - Block Check Character
 				buffer[6] = buffer[2] ^ buffer[3] ^ buffer[4] ^ buffer[5];
@@ -753,7 +753,7 @@ MFRC522::StatusCode MFRC522::PICC_Select(	Uid *uid,			///< Pointer to Uid struct
 				responseLength	= 3;
 			}
 			else { // This is an ANTICOLLISION.
-				//printf(F("ANTICOLLISION: currentLevelKnownBits=")); printfln(currentLevelKnownBits, DEC);
+				//print(F("ANTICOLLISION: currentLevelKnownBits=")); println(currentLevelKnownBits, DEC);
 				txLastBits		= currentLevelKnownBits % 8;
 				count			= currentLevelKnownBits / 8;	// Number of whole bytes in the UID part.
 				index			= 2 + count;					// Number of whole bytes: SEL + NVB + UIDs
@@ -1365,20 +1365,20 @@ const char *MFRC522::PICC_GetTypeName(PICC_Type piccType	///< One of the PICC_Ty
 void MFRC522::PCD_DumpVersionToSerial() {
 	// Get the MFRC522 firmware version
 	byte v = PCD_ReadRegister(VersionReg);
-	printf("Firmware Version: 0x\n");
-	printf("%x",v);
+	println("Firmware Version: 0x");
+	print(v, HEX);
 	// Lookup which version
 	switch(v) {
-		case 0x88: printf(" = clone\n");  break;
-		case 0x90: printf(" = v0.0\n ");     break;
-		case 0x91: printf(" = v1.0\n");     break;
-		case 0x92: printf(" = v2.0\n");     break;
-		case 0x12: printf(" = counterfeit chip\n");     break;
-		default:   printf(" = (unknown)\n");
+		case 0x88: println(" = clone");  break;
+		case 0x90: println(" = v0.0 ");     break;
+		case 0x91: println(" = v1.0");     break;
+		case 0x92: println(" = v2.0");     break;
+		case 0x12: println(" = counterfeit chip");     break;
+		default:   println(" = (unknown)");
 	}
 	// When 0x00 or 0xFF is returned, communication probably failed
 	if ((v == 0x00) || (v == 0xFF))
-		printf("WARNING: Communication failure, is the MFRC522 properly connected?\n");
+		println("WARNING: Communication failure, is the MFRC522 properly connected?");
 } // End PCD_DumpVersionToSerial()
 
 /**
@@ -1415,7 +1415,7 @@ void MFRC522::PICC_DumpToSerial(Uid *uid	///< Pointer to Uid struct returned fro
 		case PICC_TYPE_ISO_18092:
 		case PICC_TYPE_MIFARE_PLUS:
 		case PICC_TYPE_TNP3XXX:
-			printf("Dumping memory contents not implemented for that PICC type.\n");
+			println("Dumping memory contents not implemented for that PICC type.");
 			break;
 			
 		case PICC_TYPE_UNKNOWN:
@@ -1424,7 +1424,7 @@ void MFRC522::PICC_DumpToSerial(Uid *uid	///< Pointer to Uid struct returned fro
 			break; // No memory dump here
 	}
 	
-	printf(" ");
+	print(" ");
 	PICC_HaltA(); // Already done if it was a MIFARE Classic PICC.
 } // End PICC_DumpToSerial()
 
@@ -1434,26 +1434,26 @@ void MFRC522::PICC_DumpToSerial(Uid *uid	///< Pointer to Uid struct returned fro
 void MFRC522::PICC_DumpDetailsToSerial(Uid *uid	///< Pointer to Uid struct returned from a successful PICC_Select().
 									) {
 	// UID
-	printf("Card UID:");
+	print("Card UID:");
 	for (byte i = 0; i < uid->size; i++) {
 		if(uid->uidByte[i] < 0x10)
-			printf(" 0");
+			print(" 0");
 		else
-			printf(" ");
-		printf("%x",uid->uidByte[i]);
+			print(" ");
+		print(uid->uidByte[i], HEX);
 	} 
-	printf("\n");
+	println(" ");
 	
 	// SAK
-	printf("Card SAK: ");
+	print("Card SAK: ");
 	if(uid->sak < 0x10)
-		printf("0");
-	printf("%x\n",uid->sak);
+		print("0");
+	println(uid->sak, HEX);
 	
 	// (suggested) PICC type
 	PICC_Type piccType = PICC_GetType(uid->sak);
-	printf("PICC type: ");
-	printf("%s\n",PICC_GetTypeName(piccType));
+	print("PICC type: ");
+	println(PICC_GetTypeName(piccType));
 } // End PICC_DumpDetailsToSerial()
 
 /**
@@ -1487,7 +1487,7 @@ void MFRC522::PICC_DumpMifareClassicToSerial(	Uid *uid,			///< Pointer to Uid st
 	
 	// Dump sectors, highest address first.
 	if (no_of_sectors) {
-		printf("Sector Block   0  1  2  3   4  5  6  7   8  9 10 11  12 13 14 15  AccessBits\n");
+		println("Sector Block   0  1  2  3   4  5  6  7   8  9 10 11  12 13 14 15  AccessBits");
 		for (int8_t i = no_of_sectors - 1; i >= 0; i--) {
 			PICC_DumpMifareClassicSectorToSerial(uid, key, i);
 		}
@@ -1549,32 +1549,32 @@ void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to U
 		// Sector number - only on first line
 		if (isSectorTrailer) {
 			if(sector < 10)
-				printf("   "); // Pad with spaces
+				print("   "); // Pad with spaces
 			else
-				printf("  "); // Pad with spaces
-			printf("%x",sector);
-			printf("   ");
+				print("  "); // Pad with spaces
+			print(sector, HEX);
+			print("   ");
 		}
 		else {
-			printf("       ");
+			print("       ");
 		}
 		// Block number
 		if(blockAddr < 10)
-			printf("   "); // Pad with spaces
+			print("   "); // Pad with spaces
 		else {
 			if(blockAddr < 100)
-				printf("  "); // Pad with spaces
+				print("  "); // Pad with spaces
 			else
-				printf(" "); // Pad with spaces
+				print(" "); // Pad with spaces
 		}
-		printf("%x",blockAddr);
-		printf("  ");
+		print(blockAddr, HEX);
+		print("  ");
 		// Establish encrypted communications before reading the first block
 		if (isSectorTrailer) {
 			status = PCD_Authenticate(PICC_CMD_MF_AUTH_KEY_A, firstBlock, key, uid);
 			if (status != STATUS_OK) {
-				printf("PCD_Authenticate() failed: ");
-				printf(GetStatusCodeName(status));
+				print("PCD_Authenticate() failed: ");
+				print(GetStatusCodeName(status));
 				return;
 			}
 		}
@@ -1582,19 +1582,19 @@ void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to U
 		byteCount = sizeof(buffer);
 		status = MIFARE_Read(blockAddr, buffer, &byteCount);
 		if (status != STATUS_OK) {
-			printf("MIFARE_Read() failed: ");
-			printf("%s\n",GetStatusCodeName(status));
+			print("MIFARE_Read() failed: ");
+			println(GetStatusCodeName(status));
 			continue;
 		}
 		// Dump data
 		for (byte index = 0; index < 16; index++) {
 			if(buffer[index] < 0x10)
-				printf(" 0");
+				print(" 0");
 			else
-				printf(" ");
-			printf("%x",buffer[index]);
+				print(" ");
+			print(buffer[index], HEX);
 			if ((index % 4) == 3) {
-				printf(" ");
+				print(" ");
 			}
 		}
 		// Parse sector trailer data
@@ -1624,23 +1624,23 @@ void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to U
 		}
 		
 		if (firstInGroup) {
-			// printf access bits
-			printf(" [ ");
-			printf("%d",(g[group] >> 2) & 1); printf(" ");
-			printf("%d",(g[group] >> 1) & 1); printf(" ");
-			printf("%d",(g[group] >> 0) & 1);
-			printf(" ] ");
+			// print access bits
+			print(" [ ");
+			print((g[group] >> 2) & 1, DEC); print(" ");
+			print((g[group] >> 1) & 1, DEC); print(" ");
+			print((g[group] >> 0) & 1, DEC);
+			print(" ] ");
 			if (invertedError) {
-				printf(" Inverted access bits did not match! ");
+				print(" Inverted access bits did not match! ");
 			}
 		}
 		
 		if (group != 3 && (g[group] == 1 || g[group] == 6)) { // Not a sector trailer, a value block
 			int32_t value = (int32_t(buffer[3])<<24) | (int32_t(buffer[2])<<16) | (int32_t(buffer[1])<<8) | int32_t(buffer[0]);
-			printf(" Value=0x"); printf("%x",value);
-			printf(" Adr=0x"); printf("%x",buffer[12]);
+			print(" Value=0x"); print(value, HEX);
+			print(" Adr=0x"); print(buffer[12], HEX);
 		}
-		printf("\n");
+		println(" ");
 	}
 	
 	return;
@@ -1655,35 +1655,35 @@ void MFRC522::PICC_DumpMifareUltralightToSerial() {
 	byte buffer[18];
 	byte i;
 	
-	printf("Page  0  1  2  3");
+	print("Page  0  1  2  3");
 	// Try the mpages of the original Ultralight. Ultralight C has more pages.
 	for (byte page = 0; page < 16; page +=4) { // Read returns data for 4 pages at a time.
 		// Read pages
 		byteCount = sizeof(buffer);
 		status = MIFARE_Read(page, buffer, &byteCount);
 		if (status != STATUS_OK) {
-			printf("MIFARE_Read() failed: ");
-			printf("%s\n",GetStatusCodeName(status));
+			print("MIFARE_Read() failed: ");
+			println(GetStatusCodeName(status));
 			break;
 		}
 		// Dump data
 		for (byte offset = 0; offset < 4; offset++) {
 			i = page + offset;
 			if(i < 10)
-				printf("  "); // Pad with spaces
+				print("  "); // Pad with spaces
 			else
-				printf(" "); // Pad with spaces
-			printf("%d",i);
-			printf("  ");
+				print(" "); // Pad with spaces
+			print(i, DEC);
+			print("  ");
 			for (byte index = 0; index < 4; index++) {
 				i = 4 * offset + index;
 				if(buffer[i] < 0x10)
-					printf(" 0");
+					print(" 0");
 				else
-					printf(" ");
-				printf("%x",buffer[i]);
+					print(" ");
+				print(buffer[i], HEX);
 			}
-			printf("\n");
+			println(" ");
 		}
 	}
 } // End PICC_DumpMifareUltralightToSerial()
@@ -1737,19 +1737,19 @@ bool MFRC522::MIFARE_OpenUidBackdoor(bool logErrors) {
 	MFRC522::StatusCode status = PCD_TransceiveData(&cmd, (byte)1, response, &received, &validBits, (byte)0, false); // 40
 	if(status != STATUS_OK) {
 		if(logErrors) {
-			printf("Card did not respond to 0x40 after HALT command. Are you sure it is a UID changeable one?\n");
-			printf("Error name: ");
-			printf("%s\n",GetStatusCodeName(status));
+			println("Card did not respond to 0x40 after HALT command. Are you sure it is a UID changeable one?");
+			print("Error name: ");
+			println(GetStatusCodeName(status));
 		}
 		return false;
 	}
 	if (received != 1 || response[0] != 0x0A) {
 		if (logErrors) {
-			printf("Got bad response on backdoor 0x40 command: ");
-			printf("%x",response[0]);
-			printf(" (");
-			printf("%d",validBits);
-			printf(" valid bits)\n");
+			print("Got bad response on backdoor 0x40 command: ");
+			print(response[0], HEX);
+			print(" (");
+			print(validBits, DEC);
+			println(" valid bits)");
 		}
 		return false;
 	}
@@ -1759,19 +1759,19 @@ bool MFRC522::MIFARE_OpenUidBackdoor(bool logErrors) {
 	status = PCD_TransceiveData(&cmd, (byte)1, response, &received, &validBits, (byte)0, false); // 43
 	if(status != STATUS_OK) {
 		if(logErrors) {
-			printf("Error in communication at command 0x43, after successfully executing 0x40\n");
-			printf("Error name: ");
-			printf("%s\n",GetStatusCodeName(status));
+			println("Error in communication at command 0x43, after successfully executing 0x40");
+			print("Error name: ");
+			println(GetStatusCodeName(status));
 		}
 		return false;
 	}
 	if (received != 1 || response[0] != 0x0A) {
 		if (logErrors) {
-			printf("Got bad response on backdoor 0x43 command: ");
-			printf("%x",(response[0]));
-			printf(" (");
-			printf("%d",validBits);
-			printf(" valid bits)\n");
+			print("Got bad response on backdoor 0x43 command: ");
+			print(response[0]),HEX;
+			print(" (");
+			print(validBits, DEC);
+			println(" valid bits)");
 		}
 		return false;
 	}
@@ -1793,7 +1793,7 @@ bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 	// UID + BCC byte can not be larger than 16 together
 	if (!newUid || !uidSize || uidSize > 15) {
 		if (logErrors) {
-			printf("New UID buffer empty, size 0, or size > 15 given\n");
+			println("New UID buffer empty, size 0, or size > 15 given");
 		}
 		return false;
 	}
@@ -1812,7 +1812,7 @@ bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 //			  PICC_WakeupA(atqa_answer, &atqa_size);
 			
 			if (!PICC_IsNewCardPresent() || !PICC_ReadCardSerial()) {
-				printf("No card was previously selected, and none are available. Failed to set UID.\n");
+				println("No card was previously selected, and none are available. Failed to set UID.");
 				return false;
 			}
 			
@@ -1820,16 +1820,16 @@ bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 			if (status != STATUS_OK) {
 				// We tried, time to give up
 				if (logErrors) {
-					printf("Failed to authenticate to card for reading, could not set UID:\n ");
-					printf("%s\n",GetStatusCodeName(status));
+					println("Failed to authenticate to card for reading, could not set UID: ");
+					println(GetStatusCodeName(status));
 				}
 				return false;
 			}
 		}
 		else {
 			if (logErrors) {
-				printf("PCD_Authenticate() failed: ");
-				printf("%s\n",GetStatusCodeName(status));
+				print("PCD_Authenticate() failed: ");
+				println(GetStatusCodeName(status));
 			}
 			return false;
 		}
@@ -1841,9 +1841,9 @@ bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 	status = MIFARE_Read((byte)0, block0_buffer, &byteCount);
 	if (status != STATUS_OK) {
 		if (logErrors) {
-			printf("MIFARE_Read() failed: ");
-			printf("%s\n",GetStatusCodeName(status));
-			printf("Are you sure your KEY A for sector 0 is 0xFFFFFFFFFFFF?");
+			print("MIFARE_Read() failed: ");
+			println(GetStatusCodeName(status));
+			print("Are you sure your KEY A for sector 0 is 0xFFFFFFFFFFFF?");
 		}
 		return false;
 	}
@@ -1864,7 +1864,7 @@ bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 	// Activate UID backdoor
 	if (!MIFARE_OpenUidBackdoor(logErrors)) {
 		if (logErrors) {
-			printf("Activating the UID backdoor failed.\n");
+			println("Activating the UID backdoor failed.");
 		}
 		return false;
 	}
@@ -1873,8 +1873,8 @@ bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 	status = MIFARE_Write((byte)0, block0_buffer, (byte)16);
 	if (status != STATUS_OK) {
 		if (logErrors) {
-			printf("MIFARE_Write() failed: ");
-			printf("%s\n",GetStatusCodeName(status));
+			print("MIFARE_Write() failed: ");
+			println(GetStatusCodeName(status));
 		}
 		return false;
 	}
@@ -1899,8 +1899,8 @@ bool MFRC522::MIFARE_UnbrickUidSector(bool logErrors) {
 	MFRC522::StatusCode status = MIFARE_Write((byte)0, block0_buffer, (byte)16);
 	if (status != STATUS_OK) {
 		if (logErrors) {
-			printf("MIFARE_Write() failed: ");
-			printf("%s\n",GetStatusCodeName(status));
+			print("MIFARE_Write() failed: ");
+			println(GetStatusCodeName(status));
 		}
 		return false;
 	}
