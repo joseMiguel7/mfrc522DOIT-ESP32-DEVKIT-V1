@@ -44,12 +44,10 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance
 void SetUp() {
 
 	Serial.begin(9000);		// Initialize serial communications with the PC
-	while (!Serial2);		// Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
+	while (!Serial);		// Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
 	SPI.begin();			// Init SPI bus
 	mfrc522.PCD_Init();		// Init MFRC522
 	delay(4);				// Optional delay. Some board do need more time after init to be ready, see Readme
-	// for (int i=0; i<200000; i++)
-	// 	{;}
 	mfrc522.PCD_DumpVersionToSerial();	// Show details of PCD - MFRC522 Card Reader details
 	// Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 	Serial.print("Scan PICC to see UID, SAK, type, and data blocks...");
